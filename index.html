@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Map with Search</title>
+  
+  <!-- Link to Leaflet CSS for map styling -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <!-- Link to Leaflet Control Geocoder CSS for search box -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+  
+  <style>
+    /* Make the map fill the entire screen */
+    #map { height: 100vh; }
+  </style>
+</head>
+<body>
+  <!-- The map container -->
+  <div id="map"></div>
+  
+  <!-- Include Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <!-- Include Leaflet Control Geocoder JS (for search functionality) -->
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+  
+  <script>
+    // Initialize the map with a default location (London)
+    const map = L.map('map').setView([51.505, -0.09], 13);
+
+    // Set up the tile layer (OpenStreetMap)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Add a default marker (London)
+    const marker = L.marker([51.505, -0.09]).addTo(map);
+    marker.bindPopup("<b>Hello World!</b><br>I am a popup.").openPopup();
+
+    // Initialize the search function (Geocoder)
+    const geocoder = L.Control.Geocoder.nominatim();
+    L.Control.Geocoder({
+      position: 'topright', // Set search box to top-right
+      geocoder: geocoder
+    }).addTo(map);
+
+    // Handle when a user clicks on a search result
+    geocoder.on('markgeocode', function(e) {
+      const latLng = e.geocode.center;  // Get the coordinates of the search result
+      // Add a new marker at the search result location
+      L.marker(latLng).addTo(map)
+        .bindPopup("<b>You searched for: </b>" + e.geocode.name).openPopup();
+      map.setView(latLng, 13);  // Zoom to the result
+    });
+
+    // Add click event to the map to show the latitude and longitude of the clicked point
+    map.on('click', function(e) {
+      const lat = e.latlng.lat;
+      const lng = e.latlng.lng;
+      alert(`You clicked at latitude: ${lat}, longitude: ${lng}`);
+    });
+  </script>
+</body>
+</html>
